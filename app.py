@@ -159,13 +159,19 @@ class Parser:
     def while_statement(self):
         self.eat('WHILE')
         self.eat('LPAREN')
+
         left = self.expression()
-        op = self.current()[1]
-        self.eat('RELOP')
-        right = self.expression()
+        if self.current() and self.current()[0] == 'RELOP':
+            op = self.current()[1]
+            self.eat('RELOP')
+            right = self.expression()
+            condition = f"{left} {op} {right}"
+        else:
+            condition = f"{left} != 0"
+
         self.eat('RPAREN')
 
-        self.output.append(f"WHILE {left} {op} {right} DO")
+        self.output.append(f"WHILE {condition} DO")
         self.eat('LBRACE')
 
         while self.current() and self.current()[0] != 'RBRACE':
@@ -174,20 +180,18 @@ class Parser:
         self.eat('RBRACE')
         self.output.append("END WHILE")
 
-    # -------- FIXED FOR LOOP --------
     def for_statement(self):
         self.eat('FOR')
         self.eat('LPAREN')
 
-        init = self.assignment_inline()   # has semicolon
+        init = self.assignment_inline()
         cond_left = self.expression()
         op = self.current()[1]
         self.eat('RELOP')
         cond_right = self.expression()
         self.eat('SEMICOLON')
 
-        update = self.for_update()        # NO semicolon
-
+        update = self.for_update()
         self.eat('RPAREN')
 
         self.output.append(
@@ -240,7 +244,7 @@ class Parser:
 
 
 # -----------------------------
-# DRIVER CODE (USER INPUT)
+# DRIVER CODE
 # -----------------------------
 if __name__ == "__main__":
     print("Enter C-like code (type END on a new line to finish):")
@@ -255,9 +259,6 @@ if __name__ == "__main__":
     code = "\n".join(lines)
 
     tokens = lexer(code)
-    print("\nTokens:")
-    print(tokens)
-
     parser = Parser(tokens)
     pseudocode = parser.parse()
 
