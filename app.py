@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from parser_file import lexer, Parser
+import os
 
 app = Flask(__name__)
 
@@ -29,4 +30,5 @@ def parse_code():
         return jsonify({"error": f"Parse error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=False)
