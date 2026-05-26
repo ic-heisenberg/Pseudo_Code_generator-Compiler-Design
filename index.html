@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>C to Pseudocode Compiler</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f2f5f9;
+            color: #333;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* ---------- MAIN CONTAINER ---------- */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 20px;
+        }
+
+        /* ---------- EDITOR LAYOUT ---------- */
+        .editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        textarea {
+            width: 100%;
+            height: 320px;
+            resize: none;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 2px rgba(108,99,255,0.2);
+        }
+
+        .output {
+            background: #f7f8fc;
+        }
+
+        /* ---------- ACTIONS ---------- */
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(90deg, #6c63ff, #5a54e8);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108,99,255,0.4);
+        }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            text-align: center;
+            margin: 25px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 900px) {
+            .editor {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>C to Pseudocode Compiler</h1>
+    <p>Compiler Design Mini Project – Lexical Analysis & Parsing</p>
+</header>
+
+<div class="container">
+    <div class="card">
+
+        <div class="editor">
+            <div class="panel">
+                <h3>Input: C-like Code</h3>
+                <textarea id="codeInput">
+a = 10;
+b = a + 5;
+
+if(b > 10){
+    b = b + 1;
+}
+                </textarea>
+            </div>
+
+            <div class="panel">
+                <h3>Output: Generated Pseudocode</h3>
+                <textarea id="output" class="output" readonly></textarea>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button onclick="generate()">Generate Pseudocode</button>
+        </div>
+
+    </div>
+
+    <footer>
+        Project By: Ishant Chamoli | Aryan Singh | Neha Bora | Sachin Chand |
+    </footer>
+</div>
+
+<script>
+function generate() {
+    const input = document.getElementById("codeInput").value;
+    const output = document.getElementById("output");
+
+    output.value = "Processing...";
+
+    fetch("/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: input })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            output.value = "Error:\n" + data.error;
+        } else {
+            output.value = data.pseudocode;
+        }
+    })
+    .catch(() => {
+        output.value = "Server error. Please ensure Flask is running.";
+    });
+}
+</script>
+
+</body>
+</html>
