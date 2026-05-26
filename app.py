@@ -13,14 +13,20 @@ def index():
 def parse_code():
     data = request.get_json()
     code = data.get("code", "")
+    language = data.get("language", "c").lower()
+
+    if language not in ("c", "python"):
+        return jsonify({"error": f"Unsupported language: '{language}'. Choose 'c' or 'python'."}), 400
 
     try:
-        tokens = lexer(code)
-        parser = Parser(tokens)
+        tokens = lexer(code, language)
+        parser = Parser(tokens, language)
         result = parser.parse()
-        return jsonify({"pseudocode": result})
+        return jsonify({"pseudocode": result, "language": language})
+    except SyntaxError as e:
+        return jsonify({"error": f"Syntax error: {str(e)}"}), 400
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": f"Parse error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
